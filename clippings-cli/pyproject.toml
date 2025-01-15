@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "clippings-cli"
+version = "0.1.0"
+description = ""
+authors = []
+packages = [
+    { include = "clippings_cli" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+click = "^8.1.8"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+clippings-cli = "clippings_cli.__main__:cli" # entrypoint to the CLI
