@@ -175,3 +175,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Clippings files
+*Clippings.txt
+*clippings.txt
