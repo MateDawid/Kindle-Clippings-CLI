@@ -1,6 +1,7 @@
 import os
 
 import click
+from clippings_cli.clippings_service import ClippingsService
 
 
 def get_full_path(path: str | None) -> str | None:
@@ -56,3 +57,5 @@ def convert(path: str | None, format: str):
     if full_path is None:
         exit()
     click.echo(click.style(f"Clippings file [{full_path}] processing started.", fg="yellow", underline=True), err=False)
+    clippings_service = ClippingsService(path=full_path)
+    click.echo(click.style(f"Clippings file [{full_path}] processing finished.", fg="green", underline=True), err=False)
