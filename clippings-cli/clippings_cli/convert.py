@@ -4,7 +4,7 @@ import click
 from clippings_cli.clippings_service import ClippingsService
 
 
-def get_full_path(path: str | None) -> str | None:
+def get_full_input_path(path: str | None) -> str | None:
     """
     Function to evaluate full path to Clippings file based on input path.
 
@@ -32,8 +32,35 @@ def get_full_path(path: str | None) -> str | None:
     return path
 
 
+def get_full_output_path(path: str | None, format: str) -> str | None:
+    """
+    Function to evaluate full path to Clippings file based on input path.
+
+    Args:
+        path (str | None): Path to Clippings file or None.
+
+    Returns:
+        str | None: Full path to Clippings file or None in case of errors.
+    """
+    match format:
+        case "json":
+            extension = "json"
+        case "excel":
+            extension = "xlsx"
+        case _:
+            return None
+    if not path:
+        path = os.path.normpath(os.path.join(os.getcwd(), f"Output.{extension}"))
+    elif os.path.isabs(os.path.normpath(path)):
+        pass
+    else:
+        path = os.path.normpath(os.path.join(os.getcwd(), path))
+    return path
+
+
 @click.command()
-@click.option("-p", "--path", default=None, help="Path to Clippings file (full or relative).")
+@click.option("-i", "--input_path", default=None, help="Path to Clippings file (full or relative).")
+@click.option("-o", "--output_path", default=None, help="Path to output file (full or relative).")
 @click.option(
     "-f",
     "--format",
@@ -41,21 +68,64 @@ def get_full_path(path: str | None) -> str | None:
     type=click.Choice(["json", "excel"], case_sensitive=False),
     help="Output format. [json|excel]",
 )
-def convert(path: str | None, format: str):
+def convert(input_path: str | None, output_path: str | None, format: str):
     """
     Convert Clippings file to one of supported formats. [json|excel]
 
     Args:
 
-        path (str | None): Full or relative path to Clippings file. Searches for "My Clipping.txt" file in current
+        input_path (str | None): Full or relative path to Clippings file. Searches for "My Clipping.txt" file in current
+        directory by default.
+
+        output_path (str | None): Full or relative path to output file. Creates output file in current
         directory by default.
 
         format (str): Demanded format of output. [json|excel]
     """
 
-    full_path = get_full_path(path)
-    if full_path is None:
+    full_input_path = get_full_input_path(input_path)
+    full_output_path = get_full_output_path(output_path, format)
+
+    if full_input_path is None or full_output_path is None:
         exit()
-    click.echo(click.style(f"Clippings file [{full_path}] processing started.", fg="yellow", underline=True), err=False)
-    clippings_service = ClippingsService(path=full_path)
-    click.echo(click.style(f"Clippings file [{full_path}] processing finished.", fg="green", underline=True), err=False)
+    click.echo(
+        click.style(f"Clippings file [{full_input_path}] processing started.", fg="yellow", underline=True), err=False
+    )
+    clippings_service = ClippingsService(input_path=full_input_path, output_path=full_output_path)
+    click.echo(
+        click.style(f"Clippings file [{full_input_path}] processing finished.", fg="green", underline=True), err=False
+    )
+    click.echo(
+        click.style(
+            f"Output file in [{format}] format generation started at location [{full_output_path}].",
+            fg="yellow",
+            underline=True,
+        ),
+        err=False,
+    )
+    match format:
+        case "json":
+            result = clippings_service.return_as_json()
+        case "excel":
+            return
+        case _:
+            click.echo(click.style(f"Format [{format}] not supported.", fg="red", underline=True), err=True)
+            return
+    if "error" in result:
+        click.echo(
+            click.style(
+                f"Output file in [{format}] format generation finished with error [{result['error']}].",
+                fg="red",
+                underline=True,
+            ),
+            err=True,
+        )
+    else:
+        click.echo(
+            click.style(
+                f"Output file in [{format}] format generation finished at location [{full_output_path}].",
+                fg="green",
+                underline=True,
+            ),
+            err=False,
+        )
