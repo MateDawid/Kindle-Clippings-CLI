@@ -1,4 +1,7 @@
 """
+File containing ClippingsService class that manages Clippings import from input file and content
+conversion to one of supported formats.
+
 Constants:
     BOOK_WITH_PARENTHESES_REGEX (str) - Regex to handle book title Clipping line, like "Book title (Book author)".
     BOOK_WITH_DASH_REGEX (str) - Regex to handle book title Clipping line, like "Book title - Book author".
@@ -7,8 +10,9 @@ Constants:
     METADATA_WITHOUT_PAGE_REGEX (str) - Regex to handle Clipping metadata line without page as first mentioned
     param, like "- Your Bookmark at location 579 | Added on Tuesday, 27 September 2022 15:45:30".
 """
+import json
+import os
 import re
-from collections import namedtuple
 from datetime import datetime
 
 BOOK_WITH_PARENTHESES_REGEX: str = r"^(.*) \((.*)\)$"
@@ -19,29 +23,24 @@ METADATA_WITH_PAGE_REGEX: str = (
 METADATA_WITHOUT_PAGE_REGEX: str = r"^- Your (\w+) at location (\d+|\d+-\d+) \| Added on (\w+), (.*)$"
 
 
-Book = namedtuple("Book", ["title", "author"])
-Clipping = namedtuple(
-    "Clipping", ["book", "clipping_type", "page_number", "created_at", "location", "content", "error"]
-)
-
-
 class ClippingsService:
     """
     Class for retrieving Clippings from input Clippings file.
 
     Args:
-        path (str): Full path to Clippings file.
+        input_path (str): Full path to input Clippings file.
+        output_path (str): Full path to output file.
 
     Attributes:
-        clippings (list[Clipping]): List of collected Clippings.
-
+        clippings (list[dict]): List of collected Clippings.
     """
 
-    def __init__(self, path: str):
-        self.path: str = path
-        self.clippings: list[Clipping] = self._parse_clippings()
+    def __init__(self, input_path: str, output_path: str):
+        self.input_path: str = input_path
+        self.output_path: str = output_path
+        self.clippings: list[dict] = self._parse_clippings()
 
-    def _parse_clippings(self) -> list[Clipping]:
+    def _parse_clippings(self) -> list[dict]:
         """
         Parses Clippings source file and stores them in list of Clipping namedtuple objects.
 
@@ -57,7 +56,7 @@ class ClippingsService:
         """
 
         clippings = []
-        with open(self.path, "r", encoding="utf8") as file:
+        with open(self.input_path, "r", encoding="utf8") as file:
             line_number = 0
             while line := file.readline():
                 if line_number == 0:
@@ -70,13 +69,26 @@ class ClippingsService:
                     clipping = {**clipping, **parse_content_line(line)}
                 elif line_number == 4:
                     line_number = -1
-                    try:
-                        output = Clipping(**clipping, error=None)
-                    except Exception as exc:
-                        output = Clipping(**clipping, error=exc)
-                    clippings.append(output)
+                    clipping["errors"] = validate_clipping(clipping)
+                    clippings.append(clipping)
+                    clipping = {}
                 line_number += 1
         return clippings
+
+    def return_as_json(self) -> dict:
+        """
+        In provided output_path creates JSON file containing data collected from Clippings input file.
+
+        Returns:
+            dict: Dictionary containing data about potential errors.
+        """
+        try:
+            os.makedirs(os.path.dirname(self.output_path), exist_ok=True)
+            with open(self.output_path, "w", encoding="utf-8") as json_file:
+                json.dump(self.clippings, json_file, ensure_ascii=False, indent=4)
+        except PermissionError as e:
+            return {"error": e}
+        return {}
 
 
 def parse_book_line(line: str) -> dict:
@@ -96,7 +108,7 @@ def parse_book_line(line: str) -> dict:
         book_title, author = match.groups()
     else:
         return {}
-    return {"book": Book(title=book_title.strip(), author=author.strip())}
+    return {"book": {"title": book_title.strip(), "author": author.strip()}}
 
 
 def parse_metadata_line(line: str) -> dict:
@@ -116,13 +128,13 @@ def parse_metadata_line(line: str) -> dict:
         data["clipping_type"] = groups[0]
         data["page_number"] = groups[1]
         data["location"] = groups[3]
-        data["created_at"] = datetime.strptime(groups[5], "%d %B %Y %H:%M:%S")
+        data["created_at"] = datetime.strptime(groups[5], "%d %B %Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
     elif match := re.match(METADATA_WITHOUT_PAGE_REGEX, line):
         groups = match.groups()
         data["clipping_type"] = groups[0]
         data["page_number"] = None
         data["location"] = groups[1]
-        data["created_at"] = datetime.strptime(groups[3], "%d %B %Y %H:%M:%S")
+        data["created_at"] = datetime.strptime(groups[3], "%d %B %Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
     return data
 
 
@@ -137,3 +149,20 @@ def parse_content_line(line: str) -> dict:
         dict: Dictionary containing cleared "content" key data.
     """
     return {"content": line.replace("\xa0", " ").strip()}
+
+
+def validate_clipping(clipping: dict) -> dict:
+    """
+    Validates Clipping content after parsing.
+
+    Args:
+        clipping (dict): Parsed Clipping data.
+
+    Returns:
+        dict: Dictionary containing errors found in Clipping dictionary.
+    """
+    errors = {}
+    for field in ("book", "clipping_type", "page_number", "created_at", "location", "content"):
+        if field not in clipping:
+            errors[field] = f"Field {field} missed in Clipping."
+    return errors
