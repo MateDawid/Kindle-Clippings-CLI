@@ -1,7 +1,7 @@
 import os
 
 import click
-from clippings_cli.clippings_service import ClippingsService
+from clippings_cli.clippings_service.service import ClippingsService
 
 
 def get_full_input_path(path: str | None) -> str | None:
@@ -88,12 +88,10 @@ def convert(input_path: str | None, output_path: str | None, format: str):
 
     if full_input_path is None or full_output_path is None:
         exit()
-    click.echo(
-        click.style(f"Clippings file [{full_input_path}] processing started.", fg="yellow", underline=True), err=False
-    )
+
     clippings_service = ClippingsService(input_path=full_input_path, output_path=full_output_path)
     click.echo(
-        click.style(f"Clippings file [{full_input_path}] processing finished.", fg="green", underline=True), err=False
+        click.style(f"Clippings file [{full_input_path}] content loaded.", fg="green", underline=True), err=False
     )
     click.echo(
         click.style(
@@ -103,14 +101,8 @@ def convert(input_path: str | None, output_path: str | None, format: str):
         ),
         err=False,
     )
-    match format:
-        case "json":
-            result = clippings_service.return_as_json()
-        case "excel":
-            return
-        case _:
-            click.echo(click.style(f"Format [{format}] not supported.", fg="red", underline=True), err=True)
-            return
+    result = clippings_service.generate_output(format=format)
+
     if "error" in result:
         click.echo(
             click.style(
@@ -123,7 +115,7 @@ def convert(input_path: str | None, output_path: str | None, format: str):
     else:
         click.echo(
             click.style(
-                f"Output file in [{format}] format generation finished at location [{full_output_path}].",
+                "Output file generation finished successfully.",
                 fg="green",
                 underline=True,
             ),
