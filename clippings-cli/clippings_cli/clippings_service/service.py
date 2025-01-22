@@ -3,10 +3,10 @@ File containing ClippingsService class that manages Clippings import from input 
 conversion to one of supported formats.
 """
 import click
+from clippings_cli.clippings_service.format_handlers.excel_handlers import generate_excel
+from clippings_cli.clippings_service.format_handlers.json_handlers import generate_json
 from clippings_cli.clippings_service.parsers import parse_book_line, parse_content_line, parse_metadata_line
 from clippings_cli.clippings_service.validators import validate_fields
-from clippings_cli.format_handlers.excel_handlers import generate_excel
-from clippings_cli.format_handlers.json_handlers import generate_json
 
 
 class ClippingsService:
