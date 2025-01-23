@@ -1,6 +1,10 @@
 import click
 from clippings_cli.convert import convert
 
+# TODO:
+# Publish?
+# GitHub actions for Ci/Cd
+
 
 @click.group()
 def cli():
