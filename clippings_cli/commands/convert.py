@@ -91,11 +91,9 @@ def convert(input_path: str | None, output_path: str | None, format: str):
 
     clippings_service = ClippingsService(input_path=full_input_path, output_path=full_output_path)
     click.echo(
-        click.style(f"Clippings file [{full_input_path}] content loaded.", fg="green", underline=True), err=False
-    )
-    click.echo(
         click.style(
-            f"Output file in [{format}] format generation started at location [{full_output_path}].",
+            f"Output file generation started: \n* Format [{format}]\n"
+            f"* Input path [{full_input_path}]\n* Output path [{full_output_path}]",
             fg="yellow",
             underline=True,
         ),
