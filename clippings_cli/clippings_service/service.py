@@ -24,7 +24,6 @@ class ClippingsService:
     def __init__(self, input_path: str, output_path: str):
         self.input_path: str = input_path
         self.output_path: str = output_path
-        self.clippings: list[dict] = self._parse_clippings()
 
     def _parse_clippings(self) -> list[dict]:
         """
@@ -71,11 +70,13 @@ class ClippingsService:
         Returns:
             dict: Dictionary containing data about potential errors.
         """
+        clippings = self._parse_clippings()
+        click.echo(click.style("Clippings file content loaded.", fg="green", underline=True), err=False)
         match format:
             case "json":
-                return generate_json(clippings=self.clippings, output_path=self.output_path)
+                return generate_json(clippings=clippings, output_path=self.output_path)
             case "excel":
-                return generate_excel(clippings=self.clippings, output_path=self.output_path)
+                return generate_excel(clippings=clippings, output_path=self.output_path)
             case _:
                 click.echo(click.style(f"Format [{format}] not supported.", fg="red", underline=True), err=True)
                 return {"error": "Format not supported."}
