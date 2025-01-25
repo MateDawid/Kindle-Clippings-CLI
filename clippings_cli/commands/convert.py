@@ -87,7 +87,7 @@ def convert(input_path: str | None, output_path: str | None, format: str):
     full_output_path = get_full_output_path(output_path, format)
 
     if full_input_path is None or full_output_path is None:
-        exit()
+        exit(os.EX_IOERR)
 
     clippings_service = ClippingsService(input_path=full_input_path, output_path=full_output_path)
     click.echo(
@@ -110,6 +110,7 @@ def convert(input_path: str | None, output_path: str | None, format: str):
             ),
             err=True,
         )
+        exit(os.EX_IOERR)
     else:
         click.echo(
             click.style(
@@ -119,3 +120,4 @@ def convert(input_path: str | None, output_path: str | None, format: str):
             ),
             err=False,
         )
+        exit(os.EX_OK)
