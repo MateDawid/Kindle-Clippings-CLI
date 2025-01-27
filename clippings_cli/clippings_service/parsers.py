@@ -69,7 +69,8 @@ def parse_metadata_line(line: str) -> dict:
 
 def parse_content_line(line: str) -> dict:
     """
-    Parses content line of Clipping to get rid of unnecessary signs.
+    Parses content line of Clipping to get rid of unnecessary signs:
+    * \xa0 - replaces non-breaking space character with regular space.
 
     Args:
         line (str): File line.
