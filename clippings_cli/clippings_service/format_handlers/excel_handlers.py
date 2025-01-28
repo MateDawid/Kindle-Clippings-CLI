@@ -4,6 +4,7 @@ File containing functions for handling Excel Clippings file.
 
 import os
 from collections import OrderedDict
+from pathlib import Path
 
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.workbook import Workbook
@@ -21,6 +22,23 @@ FIELDS: OrderedDict[str, dict] = OrderedDict(
         ("Errors", {"fetch_method": lambda clipping: str(clipping["errors"]), "width": 20}),
     ]
 )
+HEADERS_STYLING = {
+    "font": Font(bold=True, color="FFFFFF"),
+    "fill": PatternFill(start_color="595959", end_color="595959", fill_type="solid"),
+    "alignment": Alignment(horizontal="center", vertical="center"),
+    "border": Border(
+        left=Side(style="thin"), right=Side(style="thin"), top=Side(style="thin"), bottom=Side(style="thin")
+    ),
+}
+
+DATA_STYLING: dict = {
+    "font": Font(color="000000"),
+    "fill": PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid"),
+    "alignment": Alignment(horizontal="left", vertical="center"),
+    "border": Border(
+        left=Side(style="thin"), right=Side(style="thin"), top=Side(style="thin"), bottom=Side(style="thin")
+    ),
+}
 
 
 def apply_headers_styling(ws: Worksheet) -> None:
@@ -35,18 +53,11 @@ def apply_headers_styling(ws: Worksheet) -> None:
     Args:
         ws (Worksheet): Excel worksheet object.
     """
-    header_font = Font(bold=True, color="FFFFFF")
-    header_fill = PatternFill(start_color="595959", end_color="595959", fill_type="solid")
-    header_alignment = Alignment(horizontal="center", vertical="center")
-    header_border = Border(
-        left=Side(style="thin"), right=Side(style="thin"), top=Side(style="thin"), bottom=Side(style="thin")
-    )
-
     for cell in ws[1]:
-        cell.font = header_font
-        cell.fill = header_fill
-        cell.alignment = header_alignment
-        cell.border = header_border
+        cell.font = HEADERS_STYLING["font"]
+        cell.fill = HEADERS_STYLING["fill"]
+        cell.alignment = HEADERS_STYLING["alignment"]
+        cell.border = HEADERS_STYLING["border"]
 
     # Add filters to the headers
     ws.auto_filter.ref = ws.dimensions
@@ -67,28 +78,21 @@ def apply_data_cells_styling(ws: Worksheet):
     Args:
         ws (Worksheet): Excel worksheet object.
     """
-    data_font = Font(color="000000")
-    data_fill = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
-    data_alignment = Alignment(horizontal="left", vertical="center")
-    data_border = Border(
-        left=Side(style="thin"), right=Side(style="thin"), top=Side(style="thin"), bottom=Side(style="thin")
-    )
-
     for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
         for cell in row:
-            cell.font = data_font
-            cell.fill = data_fill
-            cell.alignment = data_alignment
-            cell.border = data_border
+            cell.font = DATA_STYLING["font"]
+            cell.fill = DATA_STYLING["fill"]
+            cell.alignment = DATA_STYLING["alignment"]
+            cell.border = DATA_STYLING["border"]
 
 
-def generate_excel(clippings: list[dict], output_path: str) -> dict:
+def generate_excel(clippings: list[dict], output_path: Path | str) -> dict:
     """
     In provided output_path creates Excel file containing data collected from Clippings input file.
 
     Args:
         clippings (list[dict]): List of collected Clippings.
-        output_path (str): Full path to output file.
+        output_path (Path | str): Path to output file.
 
     Returns:
         dict: Dictionary containing data about potential errors.
