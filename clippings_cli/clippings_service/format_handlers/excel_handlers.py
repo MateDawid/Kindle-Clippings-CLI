@@ -5,6 +5,7 @@ File containing functions for handling Excel Clippings file.
 import os
 from collections import OrderedDict
 from pathlib import Path
+from typing import Any
 
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.workbook import Workbook
@@ -86,7 +87,7 @@ def apply_data_cells_styling(ws: Worksheet):
             cell.border = DATA_STYLING["border"]
 
 
-def generate_excel(clippings: list[dict], output_path: Path | str) -> dict:
+def generate_excel(clippings: list[dict[str, Any]], output_path: Path | str) -> dict:
     """
     In provided output_path creates Excel file containing data collected from Clippings input file.
 
