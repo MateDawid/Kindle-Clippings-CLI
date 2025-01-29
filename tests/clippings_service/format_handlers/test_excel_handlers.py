@@ -81,13 +81,13 @@ class TestExcelHandlers:
                 assert cell.alignment == DATA_STYLING["alignment"]
                 assert cell.border == DATA_STYLING["border"]
 
-    def test_generate_excel(self, output_excel_path: str, clippings: list[dict[str, Any]]):
+    def test_generate_excel(self, output_excel_path: str, clippings_list: list[dict[str, Any]]):
         """
         GIVEN: List containing two clippings.
         WHEN: Calling generate_excel() function with clippings and output path.
         THEN: Excel file generated and containing clippings data.
         """
-        result = generate_excel(clippings, output_excel_path)
+        result = generate_excel(clippings_list, output_excel_path)
         wb = load_workbook(output_excel_path)
         ws = wb.active
 
@@ -95,11 +95,11 @@ class TestExcelHandlers:
         assert os.path.exists(output_excel_path)
         assert ws.max_row == 3
         assert ws.max_column == len(FIELDS)
-        for idx, clipping in enumerate(clippings, start=2):
+        for idx, clipping in enumerate(clippings_list, start=2):
             for col in ws.columns:
                 assert ws.cell(row=idx, column=col[0].col_idx).value == FIELDS[col[0].value]["fetch_method"](clipping)
 
-    def test_generate_excel_permission_error(self, output_excel_path: str, clippings: list[dict[str, Any]]):
+    def test_generate_excel_permission_error(self, output_excel_path: str, clippings_list: list[dict[str, Any]]):
         """
         GIVEN: List containing two clippings.
         WHEN: Calling generate_excel() function with clippings and inaccessible output path.
@@ -109,7 +109,7 @@ class TestExcelHandlers:
             "clippings_cli.clippings_service.format_handlers.excel_handlers.Workbook.save",
             side_effect=PermissionError("Permission denied"),
         ):
-            result = generate_excel(clippings, output_excel_path)
+            result = generate_excel(clippings_list, output_excel_path)
 
         assert "error" in result
         assert isinstance(result["error"], PermissionError)

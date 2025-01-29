@@ -22,7 +22,7 @@ def cleanup_temp_files(request: SubRequest):
 
 
 @pytest.fixture
-def clippings() -> list[dict[str, Any]]:
+def clippings_list() -> list[dict[str, Any]]:
     """
     Example clippings for test purposes.
 
