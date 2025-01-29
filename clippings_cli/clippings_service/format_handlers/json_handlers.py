@@ -4,9 +4,10 @@ File containing functions for handling JSON Clippings file.
 
 import json
 import os
+from typing import Any
 
 
-def generate_json(clippings, output_path):
+def generate_json(clippings: list[dict[str, Any]], output_path: str):
     """
     In provided output_path creates JSON file containing data collected from Clippings input file.
 

@@ -24,9 +24,10 @@ def cleanup_temp_files(request: SubRequest):
 @pytest.fixture
 def clippings() -> list[dict[str, Any]]:
     """
+    Example clippings for test purposes.
 
-    #TODO
-
+    Returns:
+        list[dict[str, Any]]: Clippings list.
     """
     return [
         {
