@@ -1,4 +1,7 @@
 import os
+from pathlib import Path
+from typing import Any
+from unittest import mock
 
 import pytest
 from clippings_cli.clippings_service.format_handlers.excel_handlers import (
@@ -14,7 +17,16 @@ from openpyxl.workbook import Workbook
 
 
 @pytest.fixture
-def output_excel_path(tmp_path, cleanup_temp_files) -> str:
+def output_excel_path(tmp_path: Path) -> str:
+    """
+    Returns path to output file in temporary location.
+
+    Args:
+        tmp_path (Path): Temporary pytest files location.
+
+    Returns:
+         str: Path to output file in temporary pytest files location.
+    """
     return os.path.normpath(os.path.join(tmp_path, "output.xlsx"))
 
 
@@ -69,33 +81,12 @@ class TestExcelHandlers:
                 assert cell.alignment == DATA_STYLING["alignment"]
                 assert cell.border == DATA_STYLING["border"]
 
-    def test_generate_excel(self, output_excel_path: str):
+    def test_generate_excel(self, output_excel_path: str, clippings: list[dict[str, Any]]):
         """
         GIVEN: List containing two clippings.
         WHEN: Calling generate_excel() function with clippings and output path.
         THEN: Excel file generated and containing clippings data.
         """
-        clippings = [
-            {
-                "book": {"title": "Book 1", "author": "Author 1"},
-                "content": "Content 1",
-                "page_number": "1",
-                "location": "123",
-                "created_at": "2025-01-01",
-                "clipping_type": "Highlight",
-                "errors": {},
-            },
-            {
-                "book": {"title": "Book 2", "author": "Author 2"},
-                "content": "Content 2",
-                "page_number": "2",
-                "location": "456",
-                "created_at": "2025-01-02",
-                "clipping_type": "Note",
-                "errors": {},
-            },
-        ]
-
         result = generate_excel(clippings, output_excel_path)
         wb = load_workbook(output_excel_path)
         ws = wb.active
@@ -107,3 +98,19 @@ class TestExcelHandlers:
         for idx, clipping in enumerate(clippings, start=2):
             for col in ws.columns:
                 assert ws.cell(row=idx, column=col[0].col_idx).value == FIELDS[col[0].value]["fetch_method"](clipping)
+
+    def test_generate_excel_permission_error(self, output_excel_path: str, clippings: list[dict[str, Any]]):
+        """
+        GIVEN: List containing two clippings.
+        WHEN: Calling generate_excel() function with clippings and inaccessible output path.
+        THEN: PermissionError raised and handled.
+        """
+        with mock.patch(
+            "clippings_cli.clippings_service.format_handlers.excel_handlers.Workbook.save",
+            side_effect=PermissionError("Permission denied"),
+        ):
+            result = generate_excel(clippings, output_excel_path)
+
+        assert "error" in result
+        assert isinstance(result["error"], PermissionError)
+        assert str(result["error"]) == "Permission denied"
