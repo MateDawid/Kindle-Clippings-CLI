@@ -93,7 +93,7 @@ class TestExcelHandlers:
 
         assert result == {}
         assert os.path.exists(output_excel_path)
-        assert ws.max_row == 3
+        assert ws.max_row == len(clippings_list) + 1
         assert ws.max_column == len(FIELDS)
         for idx, clipping in enumerate(clippings_list, start=2):
             for col in ws.columns:
