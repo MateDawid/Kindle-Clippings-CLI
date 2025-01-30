@@ -3,7 +3,7 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
-from clippings_cli.clippings_service.service import ClippingsService
+from clippings_service.service import ClippingsService
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ class TestClippingsService:
         assert len(clippings) == 3
         assert clippings == clippings_list
 
-    @patch("clippings_cli.clippings_service.service.generate_json")
+    @patch("clippings_service.service.generate_json")
     def test_generate_output_json(
         self, mock_generate_json: MagicMock, clippings_service: ClippingsService, clippings_list: list[dict[str, Any]]
     ):
@@ -61,7 +61,7 @@ class TestClippingsService:
         mock_generate_json.assert_called_once_with(clippings=clippings_list, output_path=clippings_service.output_path)
         assert result == {}
 
-    @patch("clippings_cli.clippings_service.service.generate_excel")
+    @patch("clippings_service.service.generate_excel")
     def test_generate_output_excel(
         self, mock_generate_excel: MagicMock, clippings_service: ClippingsService, clippings_list: list[dict[str, Any]]
     ):

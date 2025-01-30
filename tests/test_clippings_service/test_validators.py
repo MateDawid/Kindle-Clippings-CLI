@@ -1,5 +1,5 @@
 import pytest
-from clippings_cli.clippings_service.validators import validate_fields
+from clippings_service.validators import validate_fields
 
 
 class TestClippingServiceValidators:

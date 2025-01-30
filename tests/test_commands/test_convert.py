@@ -2,17 +2,17 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
-from clippings_cli.commands.convert import convert
+from commands.convert import convert
 
 
-@patch("clippings_cli.commands.convert.ClippingsService.generate_output")
+@patch("commands.convert.ClippingsService.generate_output")
 class TestConvert:
     """
     "clippings_cli convert" command tests.
     """
 
-    @patch("clippings_cli.commands.convert.get_full_output_path")
-    @patch("clippings_cli.commands.convert.get_full_input_path")
+    @patch("commands.convert.get_full_output_path")
+    @patch("commands.convert.get_full_input_path")
     @pytest.mark.parametrize(
         "args",
         [
@@ -66,8 +66,8 @@ class TestConvert:
         assert result.return_value is None
         assert result.exit_code == 0
 
-    @patch("clippings_cli.commands.convert.get_full_output_path")
-    @patch("clippings_cli.commands.convert.get_full_input_path")
+    @patch("commands.convert.get_full_output_path")
+    @patch("commands.convert.get_full_input_path")
     def test_convert_failed(
         self,
         mocked_input_path: MagicMock,
@@ -97,8 +97,8 @@ class TestConvert:
         assert result.return_value is None
         assert result.exit_code == 1
 
-    @patch("clippings_cli.commands.convert.get_full_output_path")
-    @patch("clippings_cli.commands.convert.get_full_input_path")
+    @patch("commands.convert.get_full_output_path")
+    @patch("commands.convert.get_full_input_path")
     @pytest.mark.parametrize(
         "input_path",
         ["not\\existing\\path.txt", "not\\txt\\file.jpg", "not\\a\\file"],
