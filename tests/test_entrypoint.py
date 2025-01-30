@@ -1,5 +1,5 @@
 from click.testing import CliRunner
-from clippings_cli.__main__ import cli
+from entrypoint import cli
 
 
 def test_cli():

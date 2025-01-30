@@ -5,7 +5,7 @@ from typing import Any
 from unittest import mock
 
 import pytest
-from clippings_cli.clippings_service.format_handlers.json_handlers import generate_json
+from clippings_service.format_handlers.json_handlers import generate_json
 
 
 @pytest.fixture

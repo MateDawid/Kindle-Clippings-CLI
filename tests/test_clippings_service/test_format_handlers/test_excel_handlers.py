@@ -4,7 +4,7 @@ from typing import Any
 from unittest import mock
 
 import pytest
-from clippings_cli.clippings_service.format_handlers.excel_handlers import (
+from clippings_service.format_handlers.excel_handlers import (
     DATA_STYLING,
     FIELDS,
     HEADERS_STYLING,
@@ -106,7 +106,7 @@ class TestExcelHandlers:
         THEN: PermissionError raised and handled.
         """
         with mock.patch(
-            "clippings_cli.clippings_service.format_handlers.excel_handlers.Workbook.save",
+            "clippings_service.format_handlers.excel_handlers.Workbook.save",
             side_effect=PermissionError("Permission denied"),
         ):
             result = generate_excel(clippings_list, output_excel_path)

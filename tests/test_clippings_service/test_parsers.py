@@ -1,5 +1,5 @@
 import pytest
-from clippings_cli.clippings_service.parsers import parse_book_line, parse_content_line, parse_metadata_line
+from clippings_service.parsers import parse_book_line, parse_content_line, parse_metadata_line
 
 
 class TestClippingServiceParsers:
