@@ -33,7 +33,7 @@ def get_full_input_path(path: str | None) -> str | None:
     return path
 
 
-def get_full_output_path(path: str | None, format: str) -> str | None:
+def get_full_output_path(path: str | None, format: str | None) -> str | None:
     """
     Function to evaluate full path to Clippings file based on input path.
 
