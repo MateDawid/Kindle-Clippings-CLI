@@ -1,8 +1,138 @@
+import os
 from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
-from commands.convert import convert
+from commands.convert import convert, get_full_input_path, get_full_output_path
+
+
+class TestGetFullInputPath:
+    """
+    get_full_input_path function tests.
+    """
+
+    @pytest.mark.parametrize(
+        "path, expected_output",
+        (
+            pytest.param(None, os.path.normpath(os.path.join(os.getcwd(), "My Clippings.txt")), id="no-path-provided"),
+            pytest.param(
+                os.path.normpath(os.path.join(os.getcwd(), "My Clippings.txt")),
+                os.path.normpath(os.path.join(os.getcwd(), "My Clippings.txt")),
+                id="absolute-path",
+            ),
+            pytest.param(
+                "subdir/My Clippings.txt",
+                os.path.normpath(os.path.join(os.getcwd(), "subdir/My Clippings.txt")),
+                id="relative-path",
+            ),
+        ),
+    )
+    @patch("os.path.exists", return_value=True)
+    @patch("os.path.isfile", return_value=True)
+    def test_get_full_input_path_successful(
+        self, mock_isfile: MagicMock, mock_exists: MagicMock, path: str | None, expected_output: str | None
+    ):
+        """
+        GIVEN: Valid input file path - string or None.
+        WHEN: Calling get_full_input_path function with path.
+        THEN: Function output the same as expected.
+        """
+        result = get_full_input_path(path)
+
+        assert result == expected_output
+
+    @patch("os.path.exists", return_value=False)
+    def test_get_full_input_path_not_exists(self, mock_exists: MagicMock):
+        """
+        GIVEN: Not existing input file path.
+        WHEN: Calling get_full_input_path function with path.
+        THEN: Function returned None.
+        """
+        result = get_full_input_path("Clippings.txt")
+
+        assert result is None
+
+    @patch("os.path.exists", return_value=True)
+    @patch("os.path.isfile", return_value=False)
+    def test_get_full_input_path_is_not_a_file(self, mock_isfile: MagicMock, mock_exists: MagicMock):
+        """
+        GIVEN: Directory path passed as input file path.
+        WHEN: Calling get_full_input_path function with path.
+        THEN: Function returned None.
+        """
+        result = get_full_input_path("clippings/clippings")
+
+        assert result is None
+
+    @patch("os.path.exists", return_value=True)
+    @patch("os.path.isfile", return_value=True)
+    def test_get_full_input_path_is_not_txt_file(self, mock_isfile: MagicMock, mock_exists: MagicMock):
+        """
+        GIVEN: Not a .txt file path passed as input file path.
+        WHEN: Calling get_full_input_path function with path.
+        THEN: Function returned None.
+        """
+        result = get_full_input_path("clippings/clippings.xml")
+
+        assert result is None
+
+
+class TestGetFullOutputPath:
+    """
+    get_full_output_path function tests.
+    """
+
+    @pytest.mark.parametrize(
+        "path, format, expected_output",
+        (
+            pytest.param(None, "json", os.path.normpath(os.path.join(os.getcwd(), "Output.json")), id="default-json"),
+            pytest.param(None, "excel", os.path.normpath(os.path.join(os.getcwd(), "Output.xlsx")), id="default-excel"),
+            pytest.param(
+                os.path.normpath(os.path.join(os.getcwd(), "subdir", "Absolute.json")),
+                "json",
+                os.path.normpath(os.path.join(os.getcwd(), "subdir", "Absolute.json")),
+                id="absolute-json",
+            ),
+            pytest.param(
+                os.path.normpath(os.path.join(os.getcwd(), "subdir", "Absolute.xlsx")),
+                "excel",
+                os.path.normpath(os.path.join(os.getcwd(), "subdir", "Absolute.xlsx")),
+                id="absolute-excel",
+            ),
+            pytest.param(
+                os.path.normpath(os.path.join("subdir", "Absolute.json")),
+                "json",
+                os.path.normpath(os.path.join(os.getcwd(), "subdir", "Absolute.json")),
+                id="relative-json",
+            ),
+            pytest.param(
+                os.path.normpath(os.path.join("subdir", "Absolute.xlsx")),
+                "excel",
+                os.path.normpath(os.path.join(os.getcwd(), "subdir", "Absolute.xlsx")),
+                id="relative-excel",
+            ),
+        ),
+    )
+    def test_get_full_output_path_successful(self, path: str | None, format: str, expected_output: str | None):
+        """
+        GIVEN: Valid output file path - string or None.
+        WHEN: Calling get_full_output_path function with path and format.
+        THEN: Function output the same as expected.
+        """
+        result = get_full_output_path(path, format)
+
+        assert result == expected_output
+
+    @pytest.mark.parametrize("format", (None, "invalid"))
+    def test_get_full_output_path_invalid_format(self, format: str | None):
+        """
+        GIVEN: Invalid format for output file.
+        WHEN: Calling get_full_output_path function with path.
+        THEN: Function returned None.
+        """
+        result = get_full_output_path("Output.json", format)
+
+        assert result is None
 
 
 @patch("commands.convert.ClippingsService.generate_output")
