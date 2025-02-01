@@ -9,6 +9,7 @@ Constants:
     METADATA_WITHOUT_PAGE_REGEX (str) - Regex to handle Clipping metadata line without page as first mentioned
     param, like "- Your Bookmark at location 579 | Added on Tuesday, 27 September 2022 15:45:30".
 """
+
 import re
 from datetime import datetime
 
