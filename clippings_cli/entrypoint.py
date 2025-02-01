@@ -9,3 +9,6 @@ def cli():
 
 
 cli.add_command(convert)
+
+if __name__ == "__main__":
+    cli()
