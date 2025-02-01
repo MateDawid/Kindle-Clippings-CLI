@@ -37,6 +37,39 @@ pythonpath  = [
     "tests"
 ]
 
+[tool.black]
+line-length = 120
+extend-exclude = '''
+(
+  ^/.git
+  |./venv/*
+  |./__pycache__/*
+  |./.pytest_cache/*
+  |./htmlcov/*
+  |./docs/*
+  |./dist/*
+  |./.github/*"
+)
+'''
+
+[tool.isort]
+profile = 'black'
+line_length = 120
+skip_glob = [
+    ".git",
+    "venv/*",
+    "*/__pycache__/*",
+    "*/.pytest_cache/*",
+    "htmlcov/*",
+    "*/docs/*",
+    "*/dist/*",
+    "*/.github/*"
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", "venv", "__pycache__", ".pytest_cache", "htmlcov", "dist", ".github"]
+
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
