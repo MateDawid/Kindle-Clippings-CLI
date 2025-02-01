@@ -2,6 +2,7 @@ import os
 import sys
 
 import click
+
 from clippings_cli.clippings_service.service import ClippingsService
 
 
