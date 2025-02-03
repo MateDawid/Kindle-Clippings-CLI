@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clippings-cli"
-version = "1.0.0"
+version = "1.0.1"
 description = "A CLI tool for managing Kindle clippings"
 authors = ["Dawid Mateusiak <mateusiakdawid@gmail.com>"]
 license = "MIT"
