@@ -1,4 +1,5 @@
 import click
+
 from clippings_cli.commands.convert import convert
 
 
@@ -9,3 +10,6 @@ def cli():
 
 
 cli.add_command(convert)
+
+if __name__ == "__main__":
+    cli()
