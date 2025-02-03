@@ -48,12 +48,49 @@ jobs:
           source venv/bin/activate
           pytest
 
-#  publish:
+  pyinstaller-windows:
+    name: Build Windows binary
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          .\venv\Scripts\activate
+          python -m pip install --upgrade pip
+          python -m pip install -U pip setuptools
+          python -m pip install poetry
+          poetry install
+          pyinstaller clippings_cli.spec --noconfirm
+        shell: pwsh
+
+      - name: Test clippings command
+        run: |
+          .\dist\clippings.exe --help
+        shell: pwsh
+
+      - name: Publish Build Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Clippings-Windows
+          path: dist\clippings.exe
+
+      # TODO - test above
+
+#  pypi-publish:
+#    if: github.ref == 'refs/heads/master
+#    name: Publish CLI on PyPi
 #    runs-on: ubuntu-latest
 #    permissions:
 #      contents: read
 #      id-token: write
-#
 #    steps:
 #      - name: Checkout code
 #        uses: actions/checkout@v2
