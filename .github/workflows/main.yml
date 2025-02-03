@@ -146,6 +146,8 @@ jobs:
           fi
           git tag "v${{ env.VERSION }}"
           git push origin "v${{ env.VERSION }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
 
       - name: Create GitHub release
         uses: actions/create-release@v1
