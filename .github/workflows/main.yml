@@ -42,7 +42,7 @@ jobs:
       - name: "[Code quality] safety"
         run: |
           source venv/bin/activate
-          safety scan
+          safety check
       - name: "[Tests] pytest"
         run: |
           source venv/bin/activate
