@@ -146,6 +146,8 @@ jobs:
               ref: 'refs/tags/${{ env.VERSION }}',
               sha: context.sha
             })
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
 
       - name: Create GitHub release
         uses: actions/create-release@v1
