@@ -117,7 +117,7 @@ jobs:
           path: dist/clippings
 
   release:
-    if: github.ref == 'refs/heads/master
+    if: github.ref == 'refs/heads/master'
     name: Create Release and Publish
     needs: [pyinstaller-windows, pyinstaller-macos]
     runs-on: ubuntu-latest
