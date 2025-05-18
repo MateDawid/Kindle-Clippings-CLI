@@ -16,9 +16,9 @@ from datetime import datetime
 BOOK_WITH_PARENTHESES_REGEX: str = r"^(.*) \((.*)\)$"
 BOOK_WITH_DASH_REGEX: str = r"^(.*) - (.*)$"
 METADATA_WITH_PAGE_REGEX: str = (
-    r"^- Your (\w+) on page (\d+|\d+-\d+) \| (location (\d+|\d+-\d+) \| )?Added on (\w+), (.*)$"
+    r"^- [yY]our (\w+) [oO]n [pP]age (\d+|\d+-\d+) \| ([lL]ocation (\d+|\d+-\d+) \| )?[aA]dded on (\w+), (.*)$"
 )
-METADATA_WITHOUT_PAGE_REGEX: str = r"^- Your (\w+) at location (\d+|\d+-\d+) \| Added on (\w+), (.*)$"
+METADATA_WITHOUT_PAGE_REGEX: str = r"^- [yY]our (\w+) [aA]t [lL]ocation (\d+|\d+-\d+) \| [aA]dded on (\w+), (.*)$"
 
 
 def parse_book_line(line: str) -> dict:
